@@ -35,4 +35,30 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  request(`https://freegeoip.app/json/${ip}`, (error, response, body) => {
+
+    // Failed request due to invalid domain
+    if (error) {
+      callback(error, null);
+      return;
+    }
+
+    // For non-200 status code, send error
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching page. Response ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+
+    // Find latitude and longitude and convert object
+    const { latitude, longitude } = JSON.parse(body);
+
+    // console.log(typeof { latitude, longitude })
+    return callback(null, { latitude, longitude });
+
+  });
+
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
